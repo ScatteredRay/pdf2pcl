@@ -69,8 +69,30 @@ const char* FontToImproFont(GfxFont* Font)
 {
   if(!Font->getFamily())
   {
-    fprintf(stderr, "Error: Font has no family!");
-    return "STMS";
+	if(!Font->getName())
+	{
+	  fprintf(stderr, "Error: Font has no name!\n");
+	  return "STMS";
+	}
+	const char* N = Font->getName()->getCString();
+	fprintf(stderr, "  Warning: Font has no family!\n");
+	fprintf(stderr, "\tTrying best guess...\n");
+	if(strstr(N, "Arial"))
+	{
+		fprintf(stderr, "\tFound Arial font.\n");
+		return "SARIAL";
+	}
+	else if(strstr(N, "TimesNewRoman"))
+	{
+		fprintf(stderr, "\tFound Arial font.\n");
+		return "STMS";
+	}
+	else
+	{
+		fprintf(stderr, "Error: Guess Failed on font; Name: %s.\n",
+				Font->getName()->getCString());
+		return "STMS";
+	}
   }
 
   const char* F = Font->getFamily()->getCString();
@@ -253,7 +275,7 @@ public:
     state->transform(x1, y1, &x1, &y1);
     if(S1[0] < 0)
     {
-      fprintf(stderr, "Found Extended Ascii '%u' in : %s\n", ((int)S1[0]) & 0x000000FF, S1); // Weird bug where casting to int doesn't discard the rest, masking it.
+      fprintf(stderr, "  Warning: Found Extended Ascii '%u' in : %s\n", ((int)S1[0]) & 0x000000FF, S1); // Weird bug where casting to int doesn't discard the rest, masking it.
       S1++;
     }
     while(*S1 == ' ')
