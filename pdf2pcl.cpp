@@ -31,9 +31,12 @@
 #include <GfxFont.h>
 #include <cstring>
 #include <GlobalParams.h>
+#include <UnicodeMap.h>
+#include <UnicodeMapTables.h>
 #include <algorithm>
 
 const double PCLEpislon = 0.1;
+static bool UsePerChar = false;
 
 struct _PopplerDocument
 {
@@ -67,6 +70,7 @@ double intocm(double in)
 
 const char* FontToImproFont(GfxFont* Font)
 {
+
   if(!Font->getFamily())
   {
 	if(!Font->getName())
@@ -214,6 +218,11 @@ public:
   double LineWidth;
   const char* ImproFont;
   const char* FontModifiers; 
+  UnicodeMap* UMap;
+  char CurrentStr[255];
+  char* CurrentChar;
+  double CurrX, CurrY;
+  double curr_space_width;
   PCLOutputDev(const char* PCLFile)
   {
     pcl = fopen(PCLFile, "w");
@@ -222,12 +231,14 @@ public:
     LineWidth = 0.0;
     FontModifiers = "";
     ImproFont = "";
+	UMap = new UnicodeMap("ascii7", gTrue, ascii7UnicodeMapRanges, ascii7UnicodeMapLen);
   }
   ~PCLOutputDev()
   {
     // Class pointers aren't managed here, don't need to get cleaned up
     // SelectedFont is never used, just a pointer test.
     // FontModifiers only points to constants
+	UMap->decRefCnt();
     fclose(pcl);
   }
   GBool upsideDown()
@@ -236,7 +247,7 @@ public:
   }
   GBool useDrawChar()
   {
-    return gFalse;
+    return UsePerChar;
   }
   GBool interpretType3Chars()
   {
@@ -269,6 +280,10 @@ public:
   {
     double x1, y1;
     const char* S1 = S->getCString();
+	if(S1 == NULL)
+		fprintf(stderr, "\tWarning: Null String\n");
+	else if(*S1 == '\0')
+		fprintf(stderr, "\tWarning: Empty String\n");
     double space_width = GetFontSingleSpaceWidth(ImproFont, FontModifiers, SelectedFontSize);
     x1 = state->getCurX();
     y1 = state->getCurY() + state->getRise();
@@ -285,7 +300,8 @@ public:
     }
     x1 = intocm(x1);
     y1 = intocm(y1);
-    fprintf(pcl, "text\t%f\t%f\t%s\r\n", (float) x1, (float) y1, S1);
+	if(*S1)
+		fprintf(pcl, "text\t%f\t%f\t%s\r\n", (float) x1, (float) y1, S1);
   }
   virtual void updateLineWidth(GfxState* state)
   {
@@ -298,6 +314,46 @@ public:
 
     LineWidth = Width;
     fprintf(pcl, "lwid\t%d\r\n", (int)(Width*300.0));
+  }
+  virtual void beginString(GfxState* state, GooString* S)
+  {
+	memset(CurrentStr, '\0', sizeof(CurrentStr));
+	CurrentChar = CurrentStr;
+	CurrX = state->getCurX();
+	CurrY = state->getCurY() + state->getRise();
+	state->transform(CurrX, CurrY, &CurrX, &CurrY);
+	curr_space_width = GetFontSingleSpaceWidth(ImproFont, FontModifiers, SelectedFontSize);
+  }
+  virtual void drawChar(GfxState * state, double /*x*/, double /*y*/,
+			double /*dx*/, double /*dy*/,
+			double /*originX*/, double /*originY*/,
+			CharCode code, int /*nBytes*/, Unicode * u, int uLen)
+  {
+	char buffer[8];
+	memset(buffer, '\0', 8);
+	UMap->mapUnicode(u[0], buffer, 255);
+
+	if((CurrentChar - CurrentStr) >= sizeof(CurrentStr))
+	{
+		endString(state);
+		beginString(state, &GooString(""));
+
+		assert((CurrentChar - CurrentStr) >= sizeof(CurrentStr));
+	}
+	
+	if(*buffer == ' ')
+	  CurrX += curr_space_width;
+	else
+	  *(CurrentChar++) = *buffer;
+
+  }
+  virtual void endString(GfxState* state)
+  {
+	CurrX = intocm(CurrX);
+	CurrY = intocm(CurrY);
+
+	if(*CurrentStr)
+		fprintf(pcl, "text\t%f\t%f\t%s\r\n", (float)CurrX, (float)CurrY, CurrentStr);
   }
   virtual void stroke(GfxState* state)
   {
@@ -416,8 +472,8 @@ int main(int argn, char *args[])
     g_type_init ();
 
     // Get command line arguments
-    if ((argn < 3)||(argn > 4)) {
-        printf("Usage: pdf2svg <in file.pdf> <out file.svg> [<page no>]\n");
+    if ((argn < 3)||(argn > 5)) {
+        printf("Usage: pdf2pcl <in file.pdf> <out file.svg> [<page no>] [-U]\n");
         return -2;
     }
     gchar *absoluteFileName = getAbsoluteFileName(args[1]);
@@ -427,10 +483,15 @@ int main(int argn, char *args[])
     char* svgFilename = args[2];
 
     g_free(absoluteFileName);
-    if (argn == 4) {
-        // Get page number
-        pageLabel = g_strdup(args[3]);
+    if (argn >= 4) {
+		if(strcmp(args[3], "-U") == 0)
+			UsePerChar = true;
+		else // Get page number
+			pageLabel = g_strdup(args[3]); 
     }
+
+	if(argn >= 5 && strcmp(args[4], "-U") == 0)
+			UsePerChar = true;
 
     // Open the PDF file
     pdffile = poppler_document_new_from_file(filename_uri, NULL, NULL);
