@@ -4,6 +4,9 @@
 // Copyright (C) 2007 Matthew Flaschen (matthew.flaschen@gatech.edu)
 // Updated to allow conversion of all pages at once.
 
+// Copyright (C) 2009 Immigrant Software
+// Based pdf2pcl on pdf2svg code, Large sections rewritten.
+
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
 //    the Free Software Foundation, either version 2 of the License, or
@@ -80,6 +83,7 @@ const char* FontToImproFont(GfxFont* Font)
 	}
 	const char* N = Font->getName()->getCString();
 	fprintf(stderr, "  Warning: Font has no family!\n");
+	fprintf(stderr, "\tFont String:%s\n", N);
 	fprintf(stderr, "\tTrying best guess...\n");
 	if(strstr(N, "Arial"))
 	{
@@ -119,7 +123,7 @@ const char* FontToImproFont(GfxFont* Font)
 double GetFontSingleSpaceWidth(const char* font, const char* modifiers, int FontSize)
 {
   const double PPInch = 72.0;
-  const double HorizSpaceWidth = 0.25;
+  const double HorizSpaceWidth = 0.2731;
   return FontSize*HorizSpaceWidth/PPInch;
 }
 
@@ -221,6 +225,7 @@ public:
   UnicodeMap* UMap;
   char CurrentStr[255];
   char* CurrentChar;
+  double CurrHoriLength;
   double CurrX, CurrY;
   double curr_space_width;
   PCLOutputDev(const char* PCLFile)
@@ -232,6 +237,7 @@ public:
     FontModifiers = "";
     ImproFont = "";
 	UMap = new UnicodeMap("ascii7", gTrue, ascii7UnicodeMapRanges, ascii7UnicodeMapLen);
+	CurrentChar = 0;
   }
   ~PCLOutputDev()
   {
@@ -317,43 +323,64 @@ public:
   }
   virtual void beginString(GfxState* state, GooString* S)
   {
+	if(CurrentChar)
+	  endString(state);
 	memset(CurrentStr, '\0', sizeof(CurrentStr));
 	CurrentChar = CurrentStr;
-	CurrX = state->getCurX();
-	CurrY = state->getCurY() + state->getRise();
-	state->transform(CurrX, CurrY, &CurrX, &CurrY);
+	CurrX = 0.0;//state->getCurX();
+	CurrY = 0.0;//state->getCurY() + state->getRise();
+	//state->transform(CurrX, CurrY, &CurrX, &CurrY);
 	curr_space_width = GetFontSingleSpaceWidth(ImproFont, FontModifiers, SelectedFontSize);
+	CurrHoriLength = 0;
   }
-  virtual void drawChar(GfxState * state, double /*x*/, double /*y*/,
-			double /*dx*/, double /*dy*/,
+  virtual void drawChar(GfxState * state, double x, double y,
+			double dx, double dy,
 			double /*originX*/, double /*originY*/,
 			CharCode code, int /*nBytes*/, Unicode * u, int uLen)
   {
+	if(!CurrentChar)
+	  beginString(state, NULL);
+
+	if(CurrX == 0.0)
+	{
+		CurrX = x;
+		CurrY = y;
+		state->transform(CurrX, CurrY, &CurrX, &CurrY);
+	}
+
 	char buffer[8];
 	memset(buffer, '\0', 8);
-	UMap->mapUnicode(u[0], buffer, 255);
+	UMap->mapUnicode(*u, buffer, 255);
 
 	if((CurrentChar - CurrentStr) >= sizeof(CurrentStr))
 	{
 		endString(state);
-		beginString(state, &GooString(""));
+		beginString(state, NULL);
 
 		assert((CurrentChar - CurrentStr) >= sizeof(CurrentStr));
 	}
+
+	state->transformDelta(dx, dy, &dx, &dy);
 	
-	if(*buffer == ' ')
-	  CurrX += curr_space_width;
+	if((*buffer == ' ' || *buffer == '\0') && CurrentChar == CurrentStr)
+	  CurrX += dx;
+	else if(*buffer == '\0')
+	{
+	  *(CurrentChar++) = ' ';
+	  CurrHoriLength += dx;
+	}
 	else
+	{
 	  *(CurrentChar++) = *buffer;
+	  CurrHoriLength += dx;
+	}
 
   }
   virtual void endString(GfxState* state)
   {
-	CurrX = intocm(CurrX);
-	CurrY = intocm(CurrY);
-
 	if(*CurrentStr)
-		fprintf(pcl, "text\t%f\t%f\t%s\r\n", (float)CurrX, (float)CurrY, CurrentStr);
+		fprintf(pcl, "textl\t%f\t%f\t%f\t%s\r\n", (float)intocm(CurrX), (float)intocm(CurrY), (float)intocm(CurrHoriLength), CurrentStr);
+	CurrentChar = 0;
   }
   virtual void stroke(GfxState* state)
   {
