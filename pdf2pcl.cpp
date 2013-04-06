@@ -92,9 +92,14 @@ const char* FontToImproFont(GfxFont* Font)
 	}
 	else if(strstr(N, "TimesNewRoman"))
 	{
-		fprintf(stderr, "\tFound Arial font.\n");
+		fprintf(stderr, "\tFound Times font.\n");
 		return "STMS";
 	}
+    else if(strstr(N, "Helvetica"))
+    {
+        fprint(stderr, "\tFound Helvetica, using Arial font.\n");
+        return "SARIAL";
+    }
 	else
 	{
 		fprintf(stderr, "Error: Guess Failed on font; Name: %s.\n",
