@@ -97,7 +97,7 @@ const char* FontToImproFont(GfxFont* Font)
 	}
     else if(strstr(N, "Helvetica"))
     {
-        fprint(stderr, "\tFound Helvetica, using Arial font.\n");
+        fprintf(stderr, "\tFound Helvetica, using Arial font.\n");
         return "SARIAL";
     }
 	else
@@ -485,8 +485,8 @@ int convertPage(PopplerPage *page, const char* svgFilename)
 			     gFalse, gTrue,
 			     -1, -1, -1, -1,
 			     false,
-			     page->document->doc->getCatalog(),
-			     NULL, NULL, NULL);
+			     NULL, NULL,
+			     NULL, NULL);
 
     // Close the PDF file
     g_object_unref(page);

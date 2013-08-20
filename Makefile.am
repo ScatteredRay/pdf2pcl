@@ -15,6 +15,6 @@ bin_PROGRAMS = pdf2pcl
 # by guessing where the librarys may be, or by the user specifying.
 pdf2pcl_SOURCES = pdf2pcl.cpp
 pdf2pcl_CXXFLAGS = $(CAIRO_CFLAGS) $(GTK2_CFLAGS) $(POPPLERGLIB_CFLAGS) -O
-pdf2pcl_LDADD = $(CAIRO_LIBS) $(GTK2_LIBS) $(POPPLERGLIB_LIBS)
+pdf2pcl_LDADD = $(CAIRO_LIBS) $(GTK2_LIBS) $(POPPLERGLIB_LIBS) -lpoppler
 
 MAINTAINERCLEANFILES = Makefile.in
