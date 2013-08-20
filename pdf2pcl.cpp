@@ -89,8 +89,9 @@ const char* FontToImproFont(GfxFont* Font)
 	{
 		fprintf(stderr, "\tFound Arial font.\n");
 		return "SARIAL";
-	}
-	else if(strstr(N, "TimesNewRoman"))
+	}\
+	else if(strstr(N, "TimesNewRoman") ||
+            strstr(N, "Times-Roman"))
 	{
 		fprintf(stderr, "\tFound Times font.\n");
 		return "STMS";
@@ -102,7 +103,7 @@ const char* FontToImproFont(GfxFont* Font)
     }
 	else
 	{
-		fprintf(stderr, "Error: Guess Failed on font; Name: %s.\n",
+		fprintf(stderr, "Error: Guess Failed on font; Name: %s. Using Times font\n",
 				Font->getName()->getCString());
 		return "STMS";
 	}
