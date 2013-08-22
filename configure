@@ -3935,12 +3935,12 @@ if test -n "$POPPLERGLIB_CFLAGS"; then
     pkg_cv_POPPLERGLIB_CFLAGS="$POPPLERGLIB_CFLAGS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"poppler-glib >= 0.5.4\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "poppler-glib >= 0.5.4") 2>&5
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"poppler >= 0.5.4\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "poppler >= 0.5.4") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_POPPLERGLIB_CFLAGS=`$PKG_CONFIG --cflags "poppler-glib >= 0.5.4" 2>/dev/null`
+  pkg_cv_POPPLERGLIB_CFLAGS=`$PKG_CONFIG --cflags "poppler >= 0.5.4" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -3952,12 +3952,12 @@ if test -n "$POPPLERGLIB_LIBS"; then
     pkg_cv_POPPLERGLIB_LIBS="$POPPLERGLIB_LIBS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"poppler-glib >= 0.5.4\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "poppler-glib >= 0.5.4") 2>&5
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"poppler >= 0.5.4\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "poppler >= 0.5.4") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_POPPLERGLIB_LIBS=`$PKG_CONFIG --libs "poppler-glib >= 0.5.4" 2>/dev/null`
+  pkg_cv_POPPLERGLIB_LIBS=`$PKG_CONFIG --libs "poppler >= 0.5.4" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -3978,14 +3978,14 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        POPPLERGLIB_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "poppler-glib >= 0.5.4" 2>&1`
+	        POPPLERGLIB_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "poppler >= 0.5.4" 2>&1`
         else
-	        POPPLERGLIB_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "poppler-glib >= 0.5.4" 2>&1`
+	        POPPLERGLIB_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "poppler >= 0.5.4" 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$POPPLERGLIB_PKG_ERRORS" >&5
 
-	as_fn_error $? "Package requirements (poppler-glib >= 0.5.4) were not met:
+	as_fn_error $? "Package requirements (poppler >= 0.5.4) were not met:
 
 $POPPLERGLIB_PKG_ERRORS
 
