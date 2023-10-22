@@ -1,0 +1,13 @@
+{
+  "dependencies": [
+    {
+      "name": "poppler",
+      "features": [
+        "cairo",
+        "glib",
+        "private-api"
+      ]
+    },
+    "pkgconf"
+  ]
+}

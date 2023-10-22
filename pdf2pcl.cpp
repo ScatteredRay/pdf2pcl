@@ -24,7 +24,7 @@
 
 #include <glib.h>
 #include <PDFDoc.h>
-#include <poppler.h>
+#include <glib/poppler.h>
 #include <stdio.h>
 #include <string.h>
 #include <OutputDev.h>
