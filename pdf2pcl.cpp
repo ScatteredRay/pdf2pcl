@@ -266,7 +266,7 @@ public:
   {
     return false;
   }
-  virtual void updateFont(GfxState* state)
+  virtual void updateFont(GfxState* state) override
   {
     const GfxFont* Font = state->getFont().get(); // Is the scope long enough?
     const double* Mat = state->getTextMat();
@@ -285,11 +285,11 @@ public:
 
     fprintf(pcl, "font\t%s%d%s\r\n", ImproFont, SelectedFontSize, FM);
   }
-  virtual void updateTextMat(GfxState* state)
+  virtual void updateTextMat(GfxState* state) override
   {
     updateFont(state);
   }
-  virtual void drawString(GfxState* state, GooString* S)
+  virtual void drawString(GfxState* state, const GooString* S) override
   {
     double x1, y1;
     const char* S1 = S->c_str();
@@ -316,7 +316,7 @@ public:
 	if(*S1)
 		fprintf(pcl, "text\t%f\t%f\t%s\r\n", (float) x1, (float) y1, S1);
   }
-  virtual void updateLineWidth(GfxState* state)
+  virtual void updateLineWidth(GfxState* state) override
   {
     // Impro line width 
     // cm_width = (pcl_width/300.0)*2.54
@@ -328,7 +328,7 @@ public:
     LineWidth = Width;
     fprintf(pcl, "lwid\t%d\r\n", (int)(Width*300.0));
   }
-  virtual void beginString(GfxState* state, GooString* S)
+  virtual void beginString(GfxState* state, const GooString* S) override
   {
 	if(CurrentChar)
 	  endString(state);
@@ -343,7 +343,7 @@ public:
   virtual void drawChar(GfxState * state, double x, double y,
 			double dx, double dy,
 			double /*originX*/, double /*originY*/,
-			CharCode code, int /*nBytes*/, Unicode * u, int uLen)
+			CharCode code, int /*nBytes*/, const Unicode * u, int uLen) override
   {
 	if(!CurrentChar)
 	  beginString(state, NULL);
@@ -383,13 +383,13 @@ public:
 	}
 
   }
-  virtual void endString(GfxState* state)
+  virtual void endString(GfxState* state) override
   {
 	if(*CurrentStr)
 		fprintf(pcl, "textl\t%f\t%f\t%f\t%s\r\n", (float)intocm(CurrX), (float)intocm(CurrY), (float)intocm(CurrHoriLength), CurrentStr);
 	CurrentChar = 0;
   }
-  virtual void stroke(GfxState* state)
+  virtual void stroke(GfxState* state) override
   {
     double x1, y1, x2, y2;
     if(GetRectCoords(state, &x1, &y1, &x2, &y2))
@@ -435,7 +435,7 @@ public:
     }
   }
 
-  virtual void fill(GfxState* state)
+  virtual void fill(GfxState* state) override
   {
         double x1, y1, x2, y2;
     if(GetRectCoords(state, &x1, &y1, &x2, &y2))
