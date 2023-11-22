@@ -237,7 +237,9 @@ public:
   double curr_space_width;
   PCLOutputDev(const char* PCLFile)
   {
-    pcl = fopen(PCLFile, "w");
+    // For some reason, "w" was getting file types confused between unix and dos style line endings...
+    // Should investigate, perhaps BOM related? "wb" works fine since we are always writing '\r\n'
+    pcl = fopen(PCLFile, "wb");
     SelectedFont = NULL;
     SelectedFontSize = 0;
     LineWidth = 0.0;
