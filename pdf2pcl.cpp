@@ -303,9 +303,16 @@ public:
     x1 = state->getCurX();
     y1 = state->getCurY() + state->getRise();
     state->transform(x1, y1, &x1, &y1);
-    if(S1[0] < 0)
+    if(S1[0] < 0 && false)
     {
-      fprintf(stderr, "  Warning: Found Extended Ascii '%u' in : %s\n", ((int)S1[0]) & 0x000000FF, S1); // Weird bug where casting to int doesn't discard the rest, masking it.
+      switch((unsigned char)S1[0])
+      {
+      case 147: case 148:
+        '"';
+      case 167:
+        '§';
+      }
+      fprintf(stderr, "  Warning: Found Extended Ascii '%u' in : %s\n", ((unsigned char)S1[0]), S1);
       S1++;
     }
     while(*S1 == ' ')
