@@ -22,6 +22,7 @@
 
 // Definitely works with Cairo v1.2.6 and Poppler 0.5.4
 
+#include <optional>
 #include <glib.h>
 #include <PDFDoc.h>
 #include <glib/poppler.h>
@@ -71,7 +72,7 @@ double intocm(double in)
   return in*2.54;
 }
 
-const char* FontToImproFont(GfxFont* Font)
+const char* FontToImproFont(const GfxFont* Font)
 {
 
   if(!Font->getFamily())
@@ -81,7 +82,7 @@ const char* FontToImproFont(GfxFont* Font)
 	  fprintf(stderr, "Error: Font has no name!\n");
 	  return "STMS";
 	}
-	const char* N = Font->getName()->getCString();
+	const char* N = Font->getName()->c_str();
 	fprintf(stderr, "  Warning: Font has no family!\n");
 	fprintf(stderr, "\tFont String:%s\n", N);
 	fprintf(stderr, "\tTrying best guess...\n");
@@ -104,12 +105,12 @@ const char* FontToImproFont(GfxFont* Font)
 	else
 	{
 		fprintf(stderr, "Error: Guess Failed on font; Name: %s. Using Times font\n",
-				Font->getName()->getCString());
+				Font->getName()->c_str());
 		return "STMS";
 	}
   }
 
-  const char* F = Font->getFamily()->getCString();
+  const char* F = Font->getFamily()->c_str();
   if(strcmp(F, "Times New Roman") == 0)
     return "STMS";
   else if(strcmp(F, "Arial") == 0)
@@ -133,10 +134,10 @@ double GetFontSingleSpaceWidth(const char* font, const char* modifiers, int Font
   return FontSize*HorizSpaceWidth/PPInch;
 }
 
-const char* GetFontModifiers(GfxFont* Font)
+const char* GetFontModifiers(const GfxFont* Font)
 {
-  bool b = Font->isBold() || strstr(Font->getName()->getCString(), "Bold");
-  bool i = Font->isItalic() || strstr(Font->getName()->getCString(), "Italic");
+  bool b = Font->isBold() || strstr(Font->getName()->c_str(), "Bold");
+  bool i = Font->isItalic() || strstr(Font->getName()->c_str(), "Italic");
 
   if(b && i)
     return "BI";
@@ -153,7 +154,7 @@ bool GetRectCoords(GfxState* state, double* ox1, double* oy1, double* ox2, doubl
 
   using namespace std;
   
-  GfxPath* path = state->getPath();
+  const GfxPath* path = state->getPath();
   int pointcount = 0;
   double minx, maxx, miny, maxy;
   double iX, iY;
@@ -161,7 +162,7 @@ bool GetRectCoords(GfxState* state, double* ox1, double* oy1, double* ox2, doubl
   
   for(int p = 0; p < path->getNumSubpaths(); p++)
   {
-    GfxSubpath* SP = path->getSubpath(p);
+    const GfxSubpath* SP = path->getSubpath(p);
     for(int n=0; n < SP->getNumPoints()-1; n++)
     {
       double x1, y1, x2, y2;
@@ -223,7 +224,7 @@ class PCLOutputDev : public OutputDev
 {
 public:
   FILE* pcl;
-  GfxFont* SelectedFont;
+  const GfxFont* SelectedFont;
   int SelectedFontSize;
   double LineWidth;
   const char* ImproFont;
@@ -242,33 +243,33 @@ public:
     LineWidth = 0.0;
     FontModifiers = "";
     ImproFont = "";
-	UMap = new UnicodeMap("ascii7", gTrue, ascii7UnicodeMapRanges, ascii7UnicodeMapLen);
-	CurrentChar = 0;
+    UMap = new UnicodeMap("ascii7", true, ascii7UnicodeMapRanges, ascii7UnicodeMapLen);
+    CurrentChar = 0;
   }
   ~PCLOutputDev()
   {
     // Class pointers aren't managed here, don't need to get cleaned up
     // SelectedFont is never used, just a pointer test.
     // FontModifiers only points to constants
-	UMap->decRefCnt();
+    delete UMap;
     fclose(pcl);
   }
-  GBool upsideDown()
+  bool upsideDown()
   {
-    return gTrue;
+    return true;
   }
-  GBool useDrawChar()
+  bool useDrawChar()
   {
     return UsePerChar;
   }
-  GBool interpretType3Chars()
+  bool interpretType3Chars()
   {
-    return gFalse;
+    return false;
   }
   virtual void updateFont(GfxState* state)
   {
-    GfxFont* Font = state->getFont();
-    double* Mat = state->getTextMat();
+    const GfxFont* Font = state->getFont().get(); // Is the scope long enough?
+    const double* Mat = state->getTextMat();
     double Size = state->getFontSize() * Mat[0];
     if(!Font)
       return;
@@ -291,7 +292,7 @@ public:
   virtual void drawString(GfxState* state, GooString* S)
   {
     double x1, y1;
-    const char* S1 = S->getCString();
+    const char* S1 = S->c_str();
 	if(S1 == NULL)
 		fprintf(stderr, "\tWarning: Null String\n");
 	else if(*S1 == '\0')
@@ -397,10 +398,10 @@ public:
       return;
     }
 
-    GfxPath* path = state->getPath();
+    const GfxPath* path = state->getPath();
     for(int p = 0; p < path->getNumSubpaths(); p++)
     {
-      GfxSubpath* SP = path->getSubpath(p);
+      const GfxSubpath* SP = path->getSubpath(p);
       for(int n=0; n < SP->getNumPoints()-1; n++)
       {
 	x1 = SP->getX(n);
@@ -483,7 +484,7 @@ int convertPage(PopplerPage *page, const char* svgFilename)
     PCLOutputDev* output_dev = new PCLOutputDev(svgFilename);
     page->page->displaySlice(output_dev,
 			     1.0, 1.0, 0,
-			     gFalse, gTrue,
+			     false, true,
 			     -1, -1, -1, -1,
 			     false,
 			     NULL, NULL,
