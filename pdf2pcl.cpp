@@ -446,14 +446,18 @@ public:
 
   virtual void fill(GfxState* state) override
   {
-        double x1, y1, x2, y2;
+    double x1, y1, x2, y2;
     if(GetRectCoords(state, &x1, &y1, &x2, &y2))
     {
       GfxGray gray;
       state->getFillGray(&gray);
-      int ImmGray = (int)(100.0-((double)gray)/655.36);
-      if(ImmGray)
-	fprintf(pcl, "shade\t%f\t%f\t%f\t%f\t%d\r\n", intocm(x1), intocm(y1), intocm(x2), intocm(y2), ImmGray);
+      // Used to have this weird math previously not sure where it came from...
+      //int ImmGray = (int)(100.0-((double)gray)/655.36);
+      // 1 is white, 100 is black.. but oddly 0 renders as black.
+      // It's not super clear to me that pdf 1.0 is white, but we're going off that assumption.
+      int ImmGray = (int)(100.0*(1.0-colToDbl(gray)));
+      if(ImmGray > 0)
+        fprintf(pcl, "shade\t%f\t%f\t%f\t%f\t%d\r\n", intocm(x1), intocm(y1), intocm(x2), intocm(y2), ImmGray);
     }
     else
       fprintf(stderr, "Error: Degenerate Fill path, not closed!\n");
