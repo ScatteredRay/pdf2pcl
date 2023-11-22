@@ -9,7 +9,8 @@ $ErrorActionPreference = 'Stop';
 function Invoke-ConfigureTask {
     mkdir build -ErrorAction SilentlyContinue
     cd build
-    cmake -B . -S .. -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=C:\Users\indy\dev\vcpkg\scripts\buildsystems\vcpkg.cmake -DVCPKG_VERBOSE=ON -DVCPKG_TRACE_FIND_PACKAGE=ON -DCMAKE_FIND_DEBUG_MODE=1
+    $VCToolchain = (Join-Path $PSScriptRoot "vcpkg\scripts\buildsystems\vcpkg.cmake")
+    cmake -B . -S .. -DCMAKE_GENERATOR_PLATFORM=x64 "-DCMAKE_TOOLCHAIN_FILE=$VCToolchain"
 }
 
 function Invoke-BuildTask {
