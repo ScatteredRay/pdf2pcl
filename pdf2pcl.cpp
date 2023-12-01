@@ -102,12 +102,12 @@ const char* FontToImproFont(const GfxFont* Font)
         fprintf(stderr, "\tFound Helvetica, using Arial font.\n");
         return "SARIAL";
     }
-	else
-	{
-		fprintf(stderr, "Error: Guess Failed on font; Name: %s. Using Times font\n",
-				Font->getName()->c_str());
-		return "STMS";
-	}
+    else
+    {
+      fprintf(stderr, "Error: Guess Failed on font; Name: %s. Using Times font\n",
+        Font->getName()->c_str());
+      return "STMS";
+    }
   }
 
   const char* F = Font->getFamily()->c_str();
@@ -119,12 +119,13 @@ const char* FontToImproFont(const GfxFont* Font)
     return "STMS";
   else if(strcmp(F, "Myriad Pro") == 0)
     return "SARIAL";
-  else 
+  else if (strcmp(F, "Wingdings") == 0)
+    return "WINGDINGS";
+  else
   {
     fprintf(stderr, "Error: No conversion for font '%s'.\n", F);
     return "STMS";
   }
-  
 }
 
 double GetFontSingleSpaceWidth(const char* font, const char* modifiers, int FontSize)
