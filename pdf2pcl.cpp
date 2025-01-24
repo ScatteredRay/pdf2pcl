@@ -77,26 +77,26 @@ const char* FontToImproFont(const GfxFont* Font)
 
   if(!Font->getFamily())
   {
-	if(!Font->getName())
-	{
-	  fprintf(stderr, "Error: Font has no name!\n");
-	  return "STMS";
-	}
-	const char* N = Font->getName()->c_str();
-	fprintf(stderr, "  Warning: Font has no family!\n");
-	fprintf(stderr, "\tFont String:%s\n", N);
-	fprintf(stderr, "\tTrying best guess...\n");
-	if(strstr(N, "Arial"))
-	{
-		fprintf(stderr, "\tFound Arial font.\n");
-		return "SARIAL";
-	}\
-	else if(strstr(N, "TimesNewRoman") ||
+        if(!Font->getName())
+        {
+          fprintf(stderr, "Error: Font has no name!\n");
+          return "STMS";
+        }
+        const char* N = Font->getName()->c_str();
+        fprintf(stderr, "  Warning: Font has no family!\n");
+        fprintf(stderr, "\tFont String:%s\n", N);
+        fprintf(stderr, "\tTrying best guess...\n");
+        if(strstr(N, "Arial"))
+        {
+                fprintf(stderr, "\tFound Arial font.\n");
+                return "SARIAL";
+        }\
+        else if(strstr(N, "TimesNewRoman") ||
             strstr(N, "Times-Roman"))
-	{
-		fprintf(stderr, "\tFound Times font.\n");
-		return "STMS";
-	}
+        {
+                fprintf(stderr, "\tFound Times font.\n");
+                return "STMS";
+        }
     else if(strstr(N, "Helvetica"))
     {
         fprintf(stderr, "\tFound Helvetica, using Arial font.\n");
@@ -154,13 +154,13 @@ bool GetRectCoords(GfxState* state, double* ox1, double* oy1, double* ox2, doubl
 {
 
   using namespace std;
-  
+
   const GfxPath* path = state->getPath();
   int pointcount = 0;
   double minx, maxx, miny, maxy;
   double iX, iY;
   bool bInit = true;
-  
+
   for(int p = 0; p < path->getNumSubpaths(); p++)
   {
     const GfxSubpath* SP = path->getSubpath(p);
@@ -179,13 +179,13 @@ bool GetRectCoords(GfxState* state, double* ox1, double* oy1, double* ox2, doubl
 
       if(bInit)
       {
-	iX = x1;
-	iY = y1;
-	minx = min(x1, x2);
-	miny = min(y1, y2);
-	maxx = max(x1, x2);
-	maxy = max(y1, y2);
-	bInit = false;
+        iX = x1;
+        iY = y1;
+        minx = min(x1, x2);
+        miny = min(y1, y2);
+        maxx = max(x1, x2);
+        maxy = max(y1, y2);
+        bInit = false;
       }
 
       minx = min(minx, x1);
@@ -200,16 +200,16 @@ bool GetRectCoords(GfxState* state, double* ox1, double* oy1, double* ox2, doubl
 
       if(p == path->getNumSubpaths()-1 && n == SP->getNumPoints()-2)
       {
-	// x2/y2 is last point
-	if(abs(x2 - iX) > PCLEpislon || abs(y2 - iY) > PCLEpislon)
-	{
-	  return false;
-	}
+        // x2/y2 is last point
+        if(abs(x2 - iX) > PCLEpislon || abs(y2 - iY) > PCLEpislon)
+        {
+          return false;
+        }
       }
-      
+
     }
   }
-  
+
   if(pointcount < 4)
     return false;
 
@@ -229,7 +229,7 @@ public:
   int SelectedFontSize;
   double LineWidth;
   const char* ImproFont;
-  const char* FontModifiers; 
+  const char* FontModifiers;
   UnicodeMap* UMap;
   char CurrentStr[255];
   char* CurrentChar;
@@ -280,7 +280,7 @@ public:
 
     if(SelectedFont == Font && SelectedFontSize == (int)Size && FontModifiers == FM)
       return;
-    
+
     SelectedFont = Font;
     SelectedFontSize = (int)Size;
     FontModifiers = FM;
@@ -296,10 +296,10 @@ public:
   {
     double x1, y1;
     const char* S1 = S->c_str();
-	if(S1 == NULL)
-		fprintf(stderr, "\tWarning: Null String\n");
-	else if(*S1 == '\0')
-		fprintf(stderr, "\tWarning: Empty String\n");
+        if(S1 == NULL)
+                fprintf(stderr, "\tWarning: Null String\n");
+        else if(*S1 == '\0')
+                fprintf(stderr, "\tWarning: Empty String\n");
     double space_width = GetFontSingleSpaceWidth(ImproFont, FontModifiers, SelectedFontSize);
     x1 = state->getCurX();
     y1 = state->getCurY() + state->getRise();
@@ -323,15 +323,15 @@ public:
     }
     x1 = intocm(x1);
     y1 = intocm(y1);
-	if(*S1)
-		fprintf(pcl, "text\t%f\t%f\t%s\r\n", (float) x1, (float) y1, S1);
+        if(*S1)
+                fprintf(pcl, "text\t%f\t%f\t%s\r\n", (float) x1, (float) y1, S1);
   }
   virtual void updateLineWidth(GfxState* state) override
   {
-    // Impro line width 
+    // Impro line width
     // cm_width = (pcl_width/300.0)*2.54
     double Width = (state->getTransformedLineWidth());
-    
+
     if(Width == LineWidth)
       return;
 
@@ -340,64 +340,64 @@ public:
   }
   virtual void beginString(GfxState* state, const GooString* S) override
   {
-	if(CurrentChar)
-	  endString(state);
-	memset(CurrentStr, '\0', sizeof(CurrentStr));
-	CurrentChar = CurrentStr;
-	CurrX = 0.0;//state->getCurX();
-	CurrY = 0.0;//state->getCurY() + state->getRise();
-	//state->transform(CurrX, CurrY, &CurrX, &CurrY);
-	curr_space_width = GetFontSingleSpaceWidth(ImproFont, FontModifiers, SelectedFontSize);
-	CurrHoriLength = 0;
+        if(CurrentChar)
+          endString(state);
+        memset(CurrentStr, '\0', sizeof(CurrentStr));
+        CurrentChar = CurrentStr;
+        CurrX = 0.0;//state->getCurX();
+        CurrY = 0.0;//state->getCurY() + state->getRise();
+        //state->transform(CurrX, CurrY, &CurrX, &CurrY);
+        curr_space_width = GetFontSingleSpaceWidth(ImproFont, FontModifiers, SelectedFontSize);
+        CurrHoriLength = 0;
   }
   virtual void drawChar(GfxState * state, double x, double y,
-			double dx, double dy,
-			double /*originX*/, double /*originY*/,
-			CharCode code, int /*nBytes*/, const Unicode * u, int uLen) override
+                        double dx, double dy,
+                        double /*originX*/, double /*originY*/,
+                        CharCode code, int /*nBytes*/, const Unicode * u, int uLen) override
   {
-	if(!CurrentChar)
-	  beginString(state, NULL);
+        if(!CurrentChar)
+          beginString(state, NULL);
 
-	if(CurrX == 0.0)
-	{
-		CurrX = x;
-		CurrY = y;
-		state->transform(CurrX, CurrY, &CurrX, &CurrY);
-	}
+        if(CurrX == 0.0)
+        {
+                CurrX = x;
+                CurrY = y;
+                state->transform(CurrX, CurrY, &CurrX, &CurrY);
+        }
 
-	char buffer[8];
-	memset(buffer, '\0', 8);
-	UMap->mapUnicode(*u, buffer, 255);
+        char buffer[8];
+        memset(buffer, '\0', 8);
+        UMap->mapUnicode(*u, buffer, 255);
 
-	if((CurrentChar - CurrentStr) >= sizeof(CurrentStr))
-	{
-		endString(state);
-		beginString(state, NULL);
+        if((CurrentChar - CurrentStr) >= sizeof(CurrentStr))
+        {
+                endString(state);
+                beginString(state, NULL);
 
-		assert((CurrentChar - CurrentStr) >= sizeof(CurrentStr));
-	}
+                assert((CurrentChar - CurrentStr) >= sizeof(CurrentStr));
+        }
 
-	state->transformDelta(dx, dy, &dx, &dy);
-	
-	if((*buffer == ' ' || *buffer == '\0') && CurrentChar == CurrentStr)
-	  CurrX += dx;
-	else if(*buffer == '\0')
-	{
-	  *(CurrentChar++) = ' ';
-	  CurrHoriLength += dx;
-	}
-	else
-	{
-	  *(CurrentChar++) = *buffer;
-	  CurrHoriLength += dx;
-	}
+        state->transformDelta(dx, dy, &dx, &dy);
+
+        if((*buffer == ' ' || *buffer == '\0') && CurrentChar == CurrentStr)
+          CurrX += dx;
+        else if(*buffer == '\0')
+        {
+          *(CurrentChar++) = ' ';
+          CurrHoriLength += dx;
+        }
+        else
+        {
+          *(CurrentChar++) = *buffer;
+          CurrHoriLength += dx;
+        }
 
   }
   virtual void endString(GfxState* state) override
   {
-	if(*CurrentStr)
-		fprintf(pcl, "textl\t%f\t%f\t%f\t%s\r\n", (float)intocm(CurrX), (float)intocm(CurrY), (float)intocm(CurrHoriLength), CurrentStr);
-	CurrentChar = 0;
+        if(*CurrentStr)
+                fprintf(pcl, "textl\t%f\t%f\t%f\t%s\r\n", (float)intocm(CurrX), (float)intocm(CurrY), (float)intocm(CurrHoriLength), CurrentStr);
+        CurrentChar = 0;
   }
   virtual void stroke(GfxState* state) override
   {
@@ -414,33 +414,33 @@ public:
       const GfxSubpath* SP = path->getSubpath(p);
       for(int n=0; n < SP->getNumPoints()-1; n++)
       {
-	x1 = SP->getX(n);
-	y1 = SP->getY(n);
-	x2 = SP->getX(n+1);
-	y2 = SP->getY(n+1);
+        x1 = SP->getX(n);
+        y1 = SP->getY(n);
+        x2 = SP->getX(n+1);
+        y2 = SP->getY(n+1);
 
-	state->transform(x1, y1, &x1, &y1);
-	state->transform(x2, y2, &x2, &y2);
-	double hLw = LineWidth/2;
-	// determine line direction
-	if(fabs(x2-x1) > fabs(y2-y1))
-	{
-	  // horizontal
-	  bool bReversed = x2 < x1;
-	  fprintf(pcl, "hlin\t%f\t%f\t%f\r\n",
-		  (float)intocm((bReversed ? x2 : x1)),
-		  (float)intocm(y1-hLw),
-		  (float)intocm(fabs(x2-x1)));
-	}
-	else
-	{
-	  // vertical
-	  bool bReversed = y2 < y1;
-	  fprintf(pcl, "vlin\t%f\t%f\t%f\r\n",
-		  (float)intocm(x1-hLw),
-		  (float)intocm((bReversed ? y2 : y1)),
-		  (float)intocm(fabs(y2-y1)));
-	}
+        state->transform(x1, y1, &x1, &y1);
+        state->transform(x2, y2, &x2, &y2);
+        double hLw = LineWidth/2;
+        // determine line direction
+        if(fabs(x2-x1) > fabs(y2-y1))
+        {
+          // horizontal
+          bool bReversed = x2 < x1;
+          fprintf(pcl, "hlin\t%f\t%f\t%f\r\n",
+                  (float)intocm((bReversed ? x2 : x1)),
+                  (float)intocm(y1-hLw),
+                  (float)intocm(fabs(x2-x1)));
+        }
+        else
+        {
+          // vertical
+          bool bReversed = y2 < y1;
+          fprintf(pcl, "vlin\t%f\t%f\t%f\r\n",
+                  (float)intocm(x1-hLw),
+                  (float)intocm((bReversed ? y2 : y1)),
+                  (float)intocm(fabs(y2-y1)));
+        }
       }
     }
   }
@@ -485,7 +485,7 @@ gchar *getAbsoluteFileName(const gchar *fileName)
 
 int convertPage(PopplerPage *page, const char* svgFilename)
 {
-    // Poppler stuff 
+    // Poppler stuff
     double width, height;
 
     if (page == NULL) {
@@ -497,17 +497,17 @@ int convertPage(PopplerPage *page, const char* svgFilename)
 
     PCLOutputDev* output_dev = new PCLOutputDev(svgFilename);
     page->page->displaySlice(output_dev,
-			     1.0, 1.0, 0,
-			     false, true,
-			     -1, -1, -1, -1,
-			     false,
-			     NULL, NULL,
-			     NULL, NULL);
+                             1.0, 1.0, 0,
+                             false, true,
+                             -1, -1, -1, -1,
+                             false,
+                             NULL, NULL,
+                             NULL, NULL);
 
     // Close the PDF file
     g_object_unref(page);
-    
-    return 0;     
+
+    return 0;
 }
 
 int main(int argn, char *args[])
@@ -532,14 +532,14 @@ int main(int argn, char *args[])
 
     g_free(absoluteFileName);
     if (argn >= 4) {
-		if(strcmp(args[3], "-U") == 0)
-			UsePerChar = true;
-		else // Get page number
-			pageLabel = g_strdup(args[3]); 
+                if(strcmp(args[3], "-U") == 0)
+                        UsePerChar = true;
+                else // Get page number
+                        pageLabel = g_strdup(args[3]);
     }
 
-	if(argn >= 5 && strcmp(args[4], "-U") == 0)
-			UsePerChar = true;
+        if(argn >= 5 && strcmp(args[4], "-U") == 0)
+                        UsePerChar = true;
 
     // Open the PDF file
     pdffile = poppler_document_new_from_file(filename_uri, NULL, NULL);
@@ -554,56 +554,56 @@ int main(int argn, char *args[])
 
     if(pageLabel == NULL)
     {
-	 page = poppler_document_get_page(pdffile, 0);
-	 conversionErrors = convertPage(page, svgFilename);
+         page = poppler_document_get_page(pdffile, 0);
+         conversionErrors = convertPage(page, svgFilename);
     }
     else
     {
-	 if(strcmp(pageLabel, "all") == 0)
-	 {
-	      int curError;
-	      int pageCount = poppler_document_get_n_pages(pdffile);
-	      
-	      if(pageCount > 9999999) 
-	      {
-		   fprintf(stderr, "Too many pages (>9,999,999)\n");
-		   return -5;
-	      }
-	 
-	      char pageCountBuffer[8]; // 9,999,999 page limit
-	      sprintf(pageCountBuffer, "%d", pageCount);
+         if(strcmp(pageLabel, "all") == 0)
+         {
+              int curError;
+              int pageCount = poppler_document_get_n_pages(pdffile);
 
-	      char* svgFilenameBuffer = (char*)malloc(strlen(svgFilename) + strlen(pageCountBuffer));
+              if(pageCount > 9999999)
+              {
+                   fprintf(stderr, "Too many pages (>9,999,999)\n");
+                   return -5;
+              }
 
-	      int pageInd;
-	      for(pageInd = 0; pageInd < pageCount; pageInd++)
-	      {
-		   sprintf(svgFilenameBuffer, svgFilename, pageInd + 1);
-		   page = poppler_document_get_page(pdffile, pageInd);
-		   curError = convertPage(page, svgFilenameBuffer);
-		   if(curError != 0) {
-			conversionErrors = -1;
-		   }
-	      }
+              char pageCountBuffer[8]; // 9,999,999 page limit
+              sprintf(pageCountBuffer, "%d", pageCount);
 
-	      free(svgFilenameBuffer);
-	 }
-	 else
-	 {
-	      page = poppler_document_get_page_by_label(pdffile, pageLabel);
-	      conversionErrors = convertPage(page, svgFilename);
-	      g_free(pageLabel);
-	 }
+              char* svgFilenameBuffer = (char*)malloc(strlen(svgFilename) + strlen(pageCountBuffer));
+
+              int pageInd;
+              for(pageInd = 0; pageInd < pageCount; pageInd++)
+              {
+                   sprintf(svgFilenameBuffer, svgFilename, pageInd + 1);
+                   page = poppler_document_get_page(pdffile, pageInd);
+                   curError = convertPage(page, svgFilenameBuffer);
+                   if(curError != 0) {
+                        conversionErrors = -1;
+                   }
+              }
+
+              free(svgFilenameBuffer);
+         }
+         else
+         {
+              page = poppler_document_get_page_by_label(pdffile, pageLabel);
+              conversionErrors = convertPage(page, svgFilename);
+              g_free(pageLabel);
+         }
     }
 
     g_object_unref(pdffile);
 
     if(conversionErrors != 0) {
-	 return -4;
+         return -4;
     }
 
     else {
-	 return 0;
+         return 0;
     }
 
 }
