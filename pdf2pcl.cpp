@@ -246,7 +246,7 @@ public:
         LineWidth = 0.0;
         FontModifiers = "";
         ImproFont = "";
-        UMap = new UnicodeMap("ascii7", true, ascii7UnicodeMapRanges, ascii7UnicodeMapLen);
+        UMap = new UnicodeMap("ascii7", true, ascii7UnicodeMapRanges);
         CurrentChar = 0;
     }
     ~PCLOutputDev()

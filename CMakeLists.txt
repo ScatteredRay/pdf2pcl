@@ -3,6 +3,8 @@ cmake_policy(SET CMP0091 NEW) # enable MSVC_RUNTIME_LIBRARY
 
 set(VCPKG_TARGET_TRIPLET x64-windows-static)
 
+set(CMAKE_CXX_STANDARD 20)
+
 project(pdf2pcl)
 
 find_package(PkgConfig)
