@@ -17,3 +17,8 @@ jobs:
         shell: pwsh
         run: |
           ./build.ps1 configure, build
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: binaries
+          path: ./build/Debug/pdf2pcl.exe

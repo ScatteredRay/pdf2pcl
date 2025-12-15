@@ -5,17 +5,18 @@ Param(
 )
 
 $ErrorActionPreference = 'Stop';
+$BuildConfig = "Debug" # Release has errors
 
 function Invoke-ConfigureTask {
     mkdir build -ErrorAction SilentlyContinue
     cd build
     $VCToolchain = (Join-Path $PSScriptRoot "vcpkg\scripts\buildsystems\vcpkg.cmake")
-    cmake -B . -S .. -DCMAKE_GENERATOR_PLATFORM=x64 "-DCMAKE_TOOLCHAIN_FILE=$VCToolchain"
+    cmake -B . -S .. -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_BUILD_TYPE=$BuildConfig "-DCMAKE_TOOLCHAIN_FILE=$VCToolchain"
 }
 
 function Invoke-BuildTask {
     cd build
-    cmake --build .
+    cmake --build . --config $BuildConfig
 }
 
 function Invoke-CleanTask {
