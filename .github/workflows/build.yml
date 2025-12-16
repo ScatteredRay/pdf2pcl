@@ -20,5 +20,5 @@ jobs:
 
       - uses: actions/upload-artifact@v6
         with:
-          name: binaries
+          name: pdf2pcl
           path: ./build/Release/pdf2pcl.exe
