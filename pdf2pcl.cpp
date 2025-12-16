@@ -41,6 +41,7 @@
 
 const double PCLEpislon = 0.1;
 static bool UsePerChar = false;
+static bool UseExtendedPCL = false;
 
 struct _PopplerDocument
 {
@@ -395,8 +396,14 @@ public:
     }
     virtual void endString(GfxState* state) override
     {
-        if(*CurrentStr)
-            fprintf(pcl, "textl\t%f\t%f\t%f\t%s\r\n", (float)intocm(CurrX), (float)intocm(CurrY), (float)intocm(CurrHoriLength), CurrentStr);
+        if(*CurrentStr) {
+            if(UseExtendedPCL) {
+                fprintf(pcl, "textl\t%f\t%f\t%f\t%s\r\n", (float)intocm(CurrX), (float)intocm(CurrY), (float)intocm(CurrHoriLength), CurrentStr);
+            }
+            else {
+                fprintf(pcl, "text\t%f\t%f\t%s\r\n", (float)intocm(CurrX), (float)intocm(CurrY), CurrentStr);
+            }
+        }
         CurrentChar = 0;
     }
     virtual void stroke(GfxState* state) override
