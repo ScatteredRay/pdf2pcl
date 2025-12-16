@@ -1,0 +1,24 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: [windows-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Build
+        shell: pwsh
+        run: |
+          ./build.ps1 configure, build
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: ./build/Release/pdf2pcl.exe
