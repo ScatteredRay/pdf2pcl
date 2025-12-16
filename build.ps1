@@ -5,7 +5,7 @@ Param(
 )
 
 $ErrorActionPreference = 'Stop';
-$BuildConfig = "Debug" # Release has errors
+$BuildConfig = "Release" # Release has errors
 
 function Invoke-ConfigureTask {
     mkdir build -ErrorAction SilentlyContinue
