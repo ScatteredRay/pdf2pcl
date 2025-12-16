@@ -103,6 +103,11 @@ const char* FontToImproFont(const GfxFont* Font)
                     fprintf(stderr, "\tFound Helvetica, using Arial font.\n");
                     return "SARIAL";
                 }
+            else if(strstr(N, "Calibri"))
+                {
+                    fprintf(stderr, "\tFound Calibri, using Arial font.\n");
+                    return "SARIAL";
+                }
             else
                 {
                     fprintf(stderr, "Error: Guess Failed on font; Name: %s. Using Times font\n",
