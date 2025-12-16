@@ -119,6 +119,10 @@ const char* FontToImproFont(const GfxFont* Font)
     const char* F = Font->getFamily()->c_str();
     if(strcmp(F, "Times New Roman") == 0)
         return "STMS";
+    else if(strcmp(F, "Helvetica") == 0)
+        return "SARIAL";
+    else if(strcmp(F, "Calibri") == 0)
+        return "SARIAL";
     else if(strcmp(F, "Arial") == 0)
         return "SARIAL";
     else if(strcmp(F, "Courier New") == 0)
