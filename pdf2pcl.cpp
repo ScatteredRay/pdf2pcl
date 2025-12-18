@@ -106,7 +106,7 @@ const char* FontToImproFont(const GfxFont* Font)
             else if(strstr(N, "Calibri"))
                 {
                     fprintf(stderr, "\tFound Calibri, using Arial font.\n");
-                    return "SARIAL";
+                    return "CALIBRI";
                 }
             else
                 {
@@ -122,7 +122,7 @@ const char* FontToImproFont(const GfxFont* Font)
     else if(strcmp(F, "Helvetica") == 0)
         return "SARIAL";
     else if(strcmp(F, "Calibri") == 0)
-        return "SARIAL";
+        return "CALIBRI";
     else if(strcmp(F, "Arial") == 0)
         return "SARIAL";
     else if(strcmp(F, "Courier New") == 0)
